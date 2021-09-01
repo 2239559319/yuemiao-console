@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "moduleResolution": "node",
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "importHelpers": false,
+    "noEmitHelpers": true,
+    "declaration": false,
+    "removeComments": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}
