@@ -3,7 +3,8 @@ import typescript from '@rollup/plugin-typescript';
 const globals = {
   axios: 'axios',
   vue: 'Vue',
-  'vue-router': 'VueRouter'
+  'vue-router': 'VueRouter',
+  moment: 'moment'
 };
 
 /**
@@ -16,11 +17,9 @@ const config = {
     file: 'dist/index.js',
     format: 'iife',
     globals,
-    interop: false
+    interop: false,
   },
-  plugins: [
-    typescript()
-  ]
+  plugins: [typescript()],
 };
 
 export default config;

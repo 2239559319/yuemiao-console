@@ -26,7 +26,7 @@ interface Department {
 /**
  * 预约的人
  */
-interface Person {
+export interface Person {
   address: string;
   birthday: string;
   createTime: string;
@@ -40,12 +40,29 @@ interface Person {
   userId: number;
 }
 
+type HyphenDate = `${number}-${number}-${number}`;
+
+interface WorkTime {
+  id: number;
+  depaCode: string;
+  departmentVaccineId: null | number;
+  endTime: string;
+  maxSub: number;
+  startTime: string;
+  workdayId: number;
+}
+
+interface Subscribe {
+  subNo: number;
+  subNoStr: string;
+}
+
 export async function getHpvList(catalogId: number = 11): Promise<HpvType[]> {
   const path = '/base/catalog/catalogCustoms.do';
   const res = await axios.get(path, {
     params: {
-      catalogId,
-    },
+      catalogId
+    }
   });
   const { data } = await res.data;
   return data.catalogCustoms;
@@ -57,8 +74,8 @@ export async function getChildRegion(
   const path = '/base/region/childRegions.do';
   const res = await axios.get(path, {
     params: {
-      parentCode,
-    },
+      parentCode
+    }
   });
   const { data } = await res.data;
   return data;
@@ -84,7 +101,7 @@ export async function getDepartment(
     latitude: '',
     sortType: '1',
     vaccineCode: '',
-    customId: vaccineId,
+    customId: vaccineId
   };
   const res = await axios.post(path, params);
   const { data } = await res.data;
@@ -92,20 +109,155 @@ export async function getDepartment(
 }
 
 /**
+ * 查询工作日
  * @param depaCode 对应 Department.code
- * @param linkmanId
- * @param vaccCode
- * @param vaccIndex
- * @param departmentVaccineId
- * @param month
+ * @param linkmanId 对应 Person.id
+ * @param vaccCode 对应 Department.vaccineCode
+ * @param vaccIndex 一针 | 二针 | 三针
+ * @param departmentVaccineId 对应Department.depaVaccId
+ * @param month 2021-09-01
  */
 export async function getWorkDaysByMonth(
   depaCode: string,
-  linkmanId,
-  vaccCode,
-  vaccIndex,
-  departmentVaccineId,
-  month
-) {
+  linkmanId: number,
+  vaccCode: string,
+  vaccIndex: 1 | 2 | 3,
+  departmentVaccineId: number,
+  month: HyphenDate
+): Promise<HyphenDate[]> {
+  const path = '/order/subscribe/workDaysByMonth.do';
+  const res = await axios.get(path, {
+    params: {
+      depaCode,
+      linkmanId,
+      vaccCode,
+      vaccIndex,
+      departmentVaccineId,
+      month
+    }
+  });
+  const { data } = await res.data;
+  return data.dateList;
+}
+/**
+ * 查询预约数量
+ * @param depaCode
+ * @param vaccCode
+ * @param vaccIndex
+ * @param days '20210904,20210905,20210906,20210907,20210908,20210909,20210910'
+ * @param departmentVaccineId
+ */
+export async function findSubscribeAmountByDays(
+  depaCode: string,
+  vaccCode: string,
+  vaccIndex: 1 | 2 | 3,
+  days: string,
+  departmentVaccineId: number
+): Promise<{ day: string; maxSub: number }> {
+  const path = '/subscribe/subscribe/findSubscribeAmountByDays.do';
+  const res = await axios.get(path, {
+    params: {
+      depaCode,
+      vaccCode,
+      vaccIndex,
+      days,
+      departmentVaccineId
+    }
+  });
+  const { data } = await res.data;
+  return data;
+}
 
+export async function getWorkTimes(
+  depaCode: string,
+  vaccCode: string,
+  vaccIndex: 1 | 2 | 3,
+  subsribeDate: HyphenDate,
+  departmentVaccineId: number,
+  linkmanId: number
+): Promise<WorkTime[]> {
+  const path = '/subscribe/subscribe/departmentWorkTimes2.do';
+  const res = await axios.get(path, {
+    params: {
+      depaCode,
+      vaccCode,
+      vaccIndex,
+      subsribeDate,
+      departmentVaccineId,
+      linkmanId
+    }
+  });
+  const { data } = await res.data;
+  const timeList = data.times.data;
+  return timeList;
+}
+/**
+ *
+ * @param vaccineCode
+ * @param vaccineIndex
+ * @param linkmanId
+ * @param subscribeDate
+ * @param subscirbeTime 对应 WorkTime.id
+ * @param departmentVaccineId
+ * @param depaCode 这个和上面的不一样 为 depaCode + '_' + md5(moment(now).format("YYYYMMDDHHmm") + WorkTime.id + 'fuckhacker10000')
+ * @param serviceFee 服务费
+ * @param ticket $0.__vue__.$children[0].orderTicket
+ */
+export async function subscribeAdd(
+  vaccineCode: string,
+  vaccineIndex: 1 | 2 | 3,
+  linkmanId: number,
+  subscribeDate: HyphenDate,
+  subscirbeTime: number,
+  departmentVaccineId: number,
+  depaCode: string,
+  serviceFee: number,
+  ticket: string
+): Promise<Subscribe | null> {
+  const path = '/subscribe/subscribe/add.do';
+  const res = await axios.get(path, {
+    params: {
+      vaccineCode,
+      vaccineIndex,
+      linkmanId,
+      subscribeDate,
+      subscirbeTime,
+      departmentVaccineId,
+      depaCode,
+      serviceFee,
+      ticket
+    }
+  });
+  const { data } = await res.data;
+  return data;
+}
+
+/**
+ *
+ * @param subNo 上面的Subscribe.subNoStr
+ */
+export async function getSubmitDetail(
+  subNo
+): Promise<{ subscribeId: number } | null> {
+  const path = '/subscribe/subscribe/submitDetail.do';
+  const res = await axios.get(path, {
+    params: {
+      subNo
+    }
+  });
+  const { data } = await res.data;
+  return data;
+}
+
+export async function getClientDetail(
+  id: number
+): Promise<{ vaccine: unknown; subscribe: unknown } | null> {
+  const path = '/order/subscribe/clientDetail.do';
+  const res = await axios.get(path, {
+    params: {
+      id
+    }
+  });
+  const { data } = await res.data;
+  return data;
 }
