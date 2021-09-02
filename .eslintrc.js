@@ -17,5 +17,6 @@ module.exports = {
     'indent': ['error', 2],
     'object-curly-spacing': ['error', 'always'],
     'comma-dangle': ['error', 'never']
-  }
+  },
+  ignorePatterns: ['dist/*.js', 'rollup.config.js']
 };

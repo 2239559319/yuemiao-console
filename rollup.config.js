@@ -1,4 +1,5 @@
 import typescript from '@rollup/plugin-typescript';
+import { terser } from 'rollup-plugin-terser';
 
 const globals = {
   axios: 'axios',
@@ -13,12 +14,21 @@ const globals = {
 const config = {
   external: Object.keys(globals),
   input: 'src/index.ts',
-  output: {
-    file: 'dist/index.js',
-    format: 'iife',
-    globals,
-    interop: false,
-  },
+  output: [
+    {
+      file: 'dist/index.js',
+      format: 'iife',
+      globals,
+      interop: false,
+    },
+    {
+      file: 'dist/index.min.js',
+      format: 'iife',
+      globals,
+      interop: false,
+      plugins: [terser()]
+    }
+  ],
   plugins: [typescript()],
 };
 

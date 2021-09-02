@@ -10,9 +10,29 @@ interface City {
   citySpell?: string;
 }
 
+/**
+ * 预约的人
+ */
+export interface Person {
+  address: string;
+  birthday: string;
+  createTime: string;
+  id: number;
+  idCardNo: string;
+  name: string;
+  regionCode: string;
+  relationType: string;
+  sex: number;
+  sexText: string;
+  userId: number;
+  isDefault: 0 | 1;
+}
+
 interface State {
   cities: City[];
   currentCityCode: string;
+  orderTicket: string;
+  memberList: Person[];
 }
 
 export const vm: Vue = (document.querySelector('#app') as any).__vue__;

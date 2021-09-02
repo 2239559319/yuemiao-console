@@ -1,6 +1,5 @@
-import { getDepartment } from './api';
+import { start } from './api';
 
-(async () => {
-  const data = await getDepartment('1101', '2');
-  console.log(data);
-})();
+(async (depaVaccId: number, vaccIndex: 1 | 2 | 3) => {
+  start(depaVaccId, vaccIndex);
+})(21016, 1);

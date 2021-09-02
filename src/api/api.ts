@@ -23,24 +23,20 @@ interface Department {
   vaccineName: string;
   worktimeDesc: string;
 }
+
 /**
- * 预约的人
+ * 单个医院疫苗信息
  */
-export interface Person {
-  address: string;
-  birthday: string;
-  createTime: string;
-  id: number;
-  idCardNo: string;
-  name: string;
-  regionCode: string;
-  relationType: string;
-  sex: number;
-  sexText: string;
-  userId: number;
+interface DepartmentItem {
+  departmentCode: string;
+  departmentName: string;
+  departmentVaccineId: number;
+  vaccineCode: string;
+  productId: number;
+  total: number;
 }
 
-type HyphenDate = `${number}-${number}-${number}`;
+export type HyphenDate = `${number}-${number}-${number}`;
 
 interface WorkTime {
   id: number;
@@ -109,6 +105,23 @@ export async function getDepartment(
 }
 
 /**
+ * 查询单个医院疫苗信息
+ * @param id depaVaccId
+ */
+export async function getDepartmentItem(id: number): Promise<DepartmentItem> {
+  const path = '/base/departmentVaccine/item.do';
+  const res = await axios.get(path, {
+    params: {
+      id,
+      isShowDescribtion: true,
+      showOthers: true
+    }
+  });
+  const { data } = await res.data;
+  return data;
+}
+
+/**
  * 查询工作日
  * @param depaCode 对应 Department.code
  * @param linkmanId 对应 Person.id
@@ -153,7 +166,7 @@ export async function findSubscribeAmountByDays(
   vaccIndex: 1 | 2 | 3,
   days: string,
   departmentVaccineId: number
-): Promise<{ day: string; maxSub: number }> {
+): Promise<{ day: string; maxSub: number }[]> {
   const path = '/subscribe/subscribe/findSubscribeAmountByDays.do';
   const res = await axios.get(path, {
     params: {
@@ -237,7 +250,7 @@ export async function subscribeAdd(
  * @param subNo 上面的Subscribe.subNoStr
  */
 export async function getSubmitDetail(
-  subNo
+  subNo: string
 ): Promise<{ subscribeId: number } | null> {
   const path = '/subscribe/subscribe/submitDetail.do';
   const res = await axios.get(path, {
@@ -248,7 +261,10 @@ export async function getSubmitDetail(
   const { data } = await res.data;
   return data;
 }
-
+/**
+ *
+ * @param id subscribeId
+ */
 export async function getClientDetail(
   id: number
 ): Promise<{ vaccine: unknown; subscribe: unknown } | null> {
