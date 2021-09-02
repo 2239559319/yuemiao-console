@@ -20,7 +20,7 @@ jobs:
       - run: yarn run lint
 
   publish-npm:
-    needs: build
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
