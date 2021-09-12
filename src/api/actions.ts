@@ -66,6 +66,7 @@ async function findWorkTime(
 }
 
 export function start(depaVaccId: number, vaccIndex: 1 | 2 | 3): () => void {
+  let count = 0;
   const timer = window.setInterval(async () => {
     const worktimes = await findWorkTime(depaVaccId, vaccIndex);
     if (worktimes) {
@@ -88,6 +89,7 @@ export function start(depaVaccId: number, vaccIndex: 1 | 2 | 3): () => void {
         clearInterval(timer);
       }
     }
+    console.log(`暂无可选，已选${++count}次`);
   }, 1000);
   return () => {
     clearInterval(timer);
