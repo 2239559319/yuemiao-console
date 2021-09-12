@@ -9,7 +9,7 @@ import {
   HyphenDate
 } from './api';
 import { store } from '../vue';
-import { getDefaultPerson } from '../utils';
+import { getDefaultPerson, encodeDepaCode } from '../utils';
 import moment from 'moment';
 
 const linkmanId = getDefaultPerson(store.state.memberList).id;
@@ -70,6 +70,7 @@ export function start(depaVaccId: number, vaccIndex: 1 | 2 | 3): () => void {
     const worktimes = await findWorkTime(depaVaccId, vaccIndex);
     if (worktimes) {
       const { subscirbeTime, subscribeDate, depaCode, vaccineCode } = worktimes;
+      const encodeDepaCodeStr = await encodeDepaCode(depaCode, subscirbeTime, new Date().getTime());
       const { subNoStr } = await subscribeAdd(
         vaccineCode,
         vaccIndex,
@@ -77,7 +78,7 @@ export function start(depaVaccId: number, vaccIndex: 1 | 2 | 3): () => void {
         subscribeDate,
         subscirbeTime,
         depaVaccId,
-        depaCode,
+        encodeDepaCodeStr,
         0,
         ticket);
       const { subscribeId } = await getSubmitDetail(subNoStr);
